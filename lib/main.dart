@@ -205,8 +205,8 @@ class TodoListState extends State<TodoList> {
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(
-              _todos[index].content.length > 20
-                  ? '${_todos[index].content.substring(0, 20)}...'
+              _todos[index].content.length > 69
+                  ? '${_todos[index].content.substring(0, 69)}...'
                   : _todos[index].content,
               style: TextStyle(
                 decoration: _todos[index].isCompleted
