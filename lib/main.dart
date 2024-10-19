@@ -1,26 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  tz.initializeTimeZones();
-
-  var initializationSettingsAndroid =
-      const AndroidInitializationSettings('app_icon');
-  var initializationSettingsDarwin = const DarwinInitializationSettings();
-  var initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsDarwin);
-
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   runApp(const TodoApp());
 }
@@ -35,7 +19,7 @@ class TodoApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: TodoList(),
+      home: const TodoList(),
     );
   }
 }
@@ -44,14 +28,24 @@ class Todo {
   String content;
   DateTime createdAt;
   bool isCompleted;
-  DateTime? reminderDateTime;
 
   Todo({
     required this.content,
     required this.createdAt,
     this.isCompleted = false,
-    this.reminderDateTime,
   });
+
+  Map<String, dynamic> toJson() => {
+        'content': content,
+        'createdAt': createdAt.toIso8601String(),
+        'isCompleted': isCompleted,
+      };
+
+  factory Todo.fromJson(Map<String, dynamic> json) => Todo(
+        content: json['content'],
+        createdAt: DateTime.parse(json['createdAt']),
+        isCompleted: json['isCompleted'],
+      );
 }
 
 class TodoList extends StatefulWidget {
@@ -62,17 +56,42 @@ class TodoList extends StatefulWidget {
 }
 
 class _TodoListState extends State<TodoList> {
-  final List<Todo> _todos = [];
+  List<Todo> _todos = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTodos();
+  }
+
+  void _loadTodos() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? todosJson = prefs.getString('todos');
+    if (todosJson != null) {
+      final List<dynamic> decodedJson = jsonDecode(todosJson);
+      setState(() {
+        _todos = decodedJson.map((item) => Todo.fromJson(item)).toList();
+      });
+    }
+  }
+
+  void _saveTodos() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String encodedTodos =
+        jsonEncode(_todos.map((todo) => todo.toJson()).toList());
+    await prefs.setString('todos', encodedTodos);
+  }
 
   void _addTodo() async {
     final result = await showDialog<String>(
       context: context,
-      builder: (context) => AddTodoDialog(),
+      builder: (context) => const AddTodoDialog(),
     );
     if (result != null && result.isNotEmpty) {
       setState(() {
         _todos.add(Todo(content: result, createdAt: DateTime.now()));
       });
+      _saveTodos();
     }
   }
 
@@ -80,6 +99,7 @@ class _TodoListState extends State<TodoList> {
     setState(() {
       _todos.removeAt(index);
     });
+    _saveTodos();
   }
 
   void _editTodo(int index) async {
@@ -91,61 +111,15 @@ class _TodoListState extends State<TodoList> {
       setState(() {
         _todos[index].content = result;
       });
+      _saveTodos();
     }
-  }
-
-  void _setReminder(int index) async {
-    DatePicker.showDateTimePicker(
-      context,
-      showTitleActions: true,
-      minTime: DateTime.now(),
-      maxTime: DateTime.now().add(const Duration(days: 365)),
-      onConfirm: (date) {
-        setState(() {
-          _todos[index].reminderDateTime = date;
-        });
-        _scheduleNotification(_todos[index], index);
-      },
-      currentTime: DateTime.now(),
-    );
-  }
-
-  Future<void> _scheduleNotification(Todo todo, int index) async {
-    var androidNotificationDetails = const AndroidNotificationDetails(
-      'todo_reminders',
-      'Todo Reminders',
-      channelDescription: 'Channel for Todo app reminders',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-    var iosNotificationDetails = const DarwinNotificationDetails();
-    var notificationDetails = NotificationDetails(
-      android: androidNotificationDetails,
-      iOS: iosNotificationDetails,
-    );
-
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      index,
-      'Todo Reminder',
-      todo.content,
-      tz.TZDateTime.from(todo.reminderDateTime!, tz.local),
-      notificationDetails,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(
-              'Reminder set for ${DateFormat('yyyy-MM-dd HH:mm').format(todo.reminderDateTime!)}')),
-    );
   }
 
   void _toggleComplete(int index) {
     setState(() {
       _todos[index].isCompleted = !_todos[index].isCompleted;
     });
+    _saveTodos();
   }
 
   @override
@@ -168,15 +142,8 @@ class _TodoListState extends State<TodoList> {
                     : null,
               ),
             ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                    'Created: ${DateFormat('yyyy-MM-dd').format(_todos[index].createdAt)}'),
-                if (_todos[index].reminderDateTime != null)
-                  Text(
-                      'Reminder: ${DateFormat('yyyy-MM-dd HH:mm').format(_todos[index].reminderDateTime!)}'),
-              ],
+            subtitle: Text(
+              'Created: ${DateFormat('yyyy-MM-dd').format(_todos[index].createdAt)}',
             ),
             trailing: PopupMenuButton<String>(
               onSelected: (value) {
@@ -186,9 +153,6 @@ class _TodoListState extends State<TodoList> {
                     break;
                   case 'edit':
                     _editTodo(index);
-                    break;
-                  case 'reminder':
-                    _setReminder(index);
                     break;
                   case 'complete':
                     _toggleComplete(index);
@@ -203,10 +167,6 @@ class _TodoListState extends State<TodoList> {
                 const PopupMenuItem<String>(
                   value: 'edit',
                   child: Text('Edit'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'reminder',
-                  child: Text('Set Reminder'),
                 ),
                 PopupMenuItem<String>(
                   value: 'complete',
