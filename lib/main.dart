@@ -15,9 +15,10 @@ void main() async {
 
   var initializationSettingsAndroid =
       const AndroidInitializationSettings('app_icon');
-  var initializationSettingsIOS = const IOSInitializationSettings();
+  var initializationSettingsDarwin = const DarwinInitializationSettings();
   var initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin);
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
@@ -110,17 +111,17 @@ class _TodoListState extends State<TodoList> {
   }
 
   Future<void> _scheduleNotification(Todo todo, int index) async {
-    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+    var androidNotificationDetails = const AndroidNotificationDetails(
       'todo_reminders',
       'Todo Reminders',
       channelDescription: 'Channel for Todo app reminders',
       importance: Importance.max,
       priority: Priority.high,
     );
-    var iOSPlatformChannelSpecifics = const IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: iOSPlatformChannelSpecifics,
+    var iosNotificationDetails = const DarwinNotificationDetails();
+    var notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+      iOS: iosNotificationDetails,
     );
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
@@ -128,10 +129,10 @@ class _TodoListState extends State<TodoList> {
       'Todo Reminder',
       todo.content,
       tz.TZDateTime.from(todo.reminderDateTime!, tz.local),
-      platformChannelSpecifics,
-      androidAllowWhileIdle: true,
+      notificationDetails,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
