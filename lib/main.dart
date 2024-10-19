@@ -1,8 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
-void main() {
-  runApp(TodoApp());
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  tz.initializeTimeZones();
+
+  var initializationSettingsAndroid =
+      const AndroidInitializationSettings('app_icon');
+  var initializationSettingsIOS = const IOSInitializationSettings();
+  var initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+  runApp(const TodoApp());
 }
 
 class TodoApp extends StatelessWidget {
@@ -24,11 +43,14 @@ class Todo {
   String content;
   DateTime createdAt;
   bool isCompleted;
+  DateTime? reminderDateTime;
 
-  Todo(
-      {required this.content,
-      required this.createdAt,
-      this.isCompleted = false});
+  Todo({
+    required this.content,
+    required this.createdAt,
+    this.isCompleted = false,
+    this.reminderDateTime,
+  });
 }
 
 class TodoList extends StatefulWidget {
@@ -71,10 +93,51 @@ class _TodoListState extends State<TodoList> {
     }
   }
 
-  void _setReminder(int index) {
-    // Implement reminder functionality here
+  void _setReminder(int index) async {
+    DatePicker.showDateTimePicker(
+      context,
+      showTitleActions: true,
+      minTime: DateTime.now(),
+      maxTime: DateTime.now().add(const Duration(days: 365)),
+      onConfirm: (date) {
+        setState(() {
+          _todos[index].reminderDateTime = date;
+        });
+        _scheduleNotification(_todos[index], index);
+      },
+      currentTime: DateTime.now(),
+    );
+  }
+
+  Future<void> _scheduleNotification(Todo todo, int index) async {
+    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+      'todo_reminders',
+      'Todo Reminders',
+      channelDescription: 'Channel for Todo app reminders',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+    var iOSPlatformChannelSpecifics = const IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      index,
+      'Todo Reminder',
+      todo.content,
+      tz.TZDateTime.from(todo.reminderDateTime!, tz.local),
+      platformChannelSpecifics,
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+    );
+
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Reminder set for todo ${index + 1}')),
+      SnackBar(
+          content: Text(
+              'Reminder set for ${DateFormat('yyyy-MM-dd HH:mm').format(todo.reminderDateTime!)}')),
     );
   }
 
@@ -104,8 +167,16 @@ class _TodoListState extends State<TodoList> {
                     : null,
               ),
             ),
-            subtitle:
-                Text(DateFormat('yyyy-MM-dd').format(_todos[index].createdAt)),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    'Created: ${DateFormat('yyyy-MM-dd').format(_todos[index].createdAt)}'),
+                if (_todos[index].reminderDateTime != null)
+                  Text(
+                      'Reminder: ${DateFormat('yyyy-MM-dd HH:mm').format(_todos[index].reminderDateTime!)}'),
+              ],
+            ),
             trailing: PopupMenuButton<String>(
               onSelected: (value) {
                 switch (value) {
