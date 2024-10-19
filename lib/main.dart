@@ -29,6 +29,7 @@ class TodoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Todo App',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
