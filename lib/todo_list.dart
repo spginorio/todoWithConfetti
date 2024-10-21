@@ -136,23 +136,25 @@ class TodoListState extends State<TodoList> {
     }
   }
 
-  final bgColor = const Color.fromARGB(255, 255, 255, 255);
-  final txtColor = const Color.fromARGB(255, 0, 0, 0);
-  final smallTxtColor = const Color.fromARGB(255, 53, 52, 52);
-
   @override
   Widget build(BuildContext context) {
+    final bgColor = const Color.fromARGB(255, 255, 255, 255);
+    final txtColor = const Color.fromARGB(221, 10, 22, 180);
+    final smallTxtColor = const Color.fromARGB(193, 53, 52, 52);
+
     return Scaffold(
         appBar: AppBar(
           title: Center(
             child: Text(
               'Todo List',
-              style: GoogleFonts.russoOne(
+              style: GoogleFonts.openSansCondensed(
+                decoration: TextDecoration.lineThrough,
+                letterSpacing: 3,
                 //TODO: adjust font
                 textStyle: TextStyle(
                   color: const Color.fromARGB(
-                      117, 108, 150, 146), //TODO: adjust color
-                  fontSize: 39.0,
+                      221, 12, 26, 226), //TODO: adjust color
+                  fontSize: 29.0,
                 ),
               ),
             ),
@@ -170,88 +172,110 @@ class TodoListState extends State<TodoList> {
                   decoration: BoxDecoration(
                     color: _todos[index]
                             .isCompleted //TODO: Change Box Color when Completed
-                        ? const Color.fromARGB(96, 167, 199, 177)
-                        : const Color.fromARGB(88, 161, 193, 224),
+                        ? const Color.fromARGB(29, 143, 143, 143)
+                        : const Color.fromARGB(92, 255, 241, 117),
                     borderRadius: BorderRadius.circular(20.0),
                   ),
-                  child: ListTile(
-                    title: Text(
-                      _todos[index].content.length > 69
-                          ? '${_todos[index].content.substring(0, 69)}...'
-                          : _todos[index].content,
-                      //STYLE Font for List Items
-                      style: GoogleFonts.openSans(
-                        //TODO: adjust font
-                        textStyle: TextStyle(
-                          fontSize: 21.0,
-                          fontWeight: FontWeight.w600,
-                          color: txtColor,
-                          decoration: _todos[index].isCompleted
-                              //TODO: Change text Color when Completed
-                              ? TextDecoration.lineThrough
-                              : null,
-                        ),
+                  child: Row(
+                    children: [
+                      Container(
+                        child: _todos[index].isCompleted
+                            ? Padding(
+                                padding: const EdgeInsets.only(left: 12.0),
+                                child: Icon(Icons.check,
+                                    color:
+                                        const Color.fromARGB(151, 32, 134, 23),
+                                    size: 30.0),
+                              )
+                            : null,
                       ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Created: ${DateFormat('yyyy-MM-dd').format(_todos[index].createdAt)}',
-                          style: TextStyle(
-                            //CREATED color
-                            color: smallTxtColor,
-                          ),
-                        ),
-                        if (_todos[index].reminderDateTime != null)
-                          Text(
-                            'Reminder: ${DateFormat('yyyy-MM-dd HH:mm').format(_todos[index].reminderDateTime!)}',
-                            style: TextStyle(
-                              //REMINDER color
-                              color: smallTxtColor,
+                      Expanded(
+                        child: ListTile(
+                          title: Text(
+                            _todos[index].content.length > 69
+                                ? '${_todos[index].content.substring(0, 69)}...'
+                                : _todos[index].content,
+                            //STYLE Font for List Items
+                            style: GoogleFonts.caveat(
+                              //TODO: adjust font
+                              textStyle: TextStyle(
+                                fontSize: 21.0,
+                                fontWeight: FontWeight.w600,
+                                color: _todos[index].isCompleted
+                                    ? Colors.grey
+                                    : txtColor,
+                              ),
                             ),
                           ),
-                      ],
-                    ),
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'delete':
-                            _deleteTodo(index);
-                            break;
-                          case 'edit':
-                            _editTodo(index);
-                            break;
-                          case 'complete':
-                            _toggleComplete(index);
-                            break;
-                          case 'reminder':
-                            _setReminder(index);
-                            break;
-                        }
-                      },
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(
-                          value: 'delete',
-                          child: Text('Delete'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Created: ${DateFormat('yyyy-MM-dd').format(_todos[index].createdAt)}',
+                                style: TextStyle(
+                                  //CREATED color
+                                  color: smallTxtColor,
+                                  fontFamily: GoogleFonts.openSans().fontFamily,
+                                  fontSize: 13,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              if (_todos[index].reminderDateTime != null)
+                                Text(
+                                  'Reminder: ${DateFormat('yyyy-MM-dd HH:mm').format(_todos[index].reminderDateTime!)}',
+                                  style: TextStyle(
+                                      //REMINDER color
+                                      color: smallTxtColor,
+                                      fontFamily:
+                                          GoogleFonts.openSans().fontFamily,
+                                      fontSize: 13.5,
+                                      letterSpacing: -0.3),
+                                ),
+                            ],
+                          ),
                         ),
-                        const PopupMenuItem<String>(
-                          value: 'edit',
-                          child: Text('Edit'),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'complete',
-                          child: Text(_todos[index].isCompleted
-                              ? 'Mark as Incomplete'
-                              : 'Mark as Complete'),
-                        ),
-                        const PopupMenuItem<String>(
-                          value: 'reminder',
-                          child: Text('Set Reminder'),
-                        ),
-                      ],
-                    ),
+                      ),
+                      PopupMenuButton<String>(
+                        iconColor: Colors.grey,
+                        onSelected: (value) {
+                          switch (value) {
+                            case 'delete':
+                              _deleteTodo(index);
+                              break;
+                            case 'edit':
+                              _editTodo(index);
+                              break;
+                            case 'complete':
+                              _toggleComplete(index);
+                              break;
+                            case 'reminder':
+                              _setReminder(index);
+                              break;
+                          }
+                        },
+                        itemBuilder: (BuildContext context) =>
+                            <PopupMenuEntry<String>>[
+                          const PopupMenuItem<String>(
+                            value: 'delete',
+                            child: Text('Delete'),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'edit',
+                            child: Text('Edit'),
+                          ),
+                          PopupMenuItem<String>(
+                            value: 'complete',
+                            child: Text(_todos[index].isCompleted
+                                ? 'Mark as Incomplete'
+                                : 'Mark as Complete'),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'reminder',
+                            child: Text('Set Reminder'),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               );

@@ -41,12 +41,14 @@ class Todo {
   DateTime createdAt;
   bool isCompleted;
   DateTime? reminderDateTime;
+  IconData? icon;
 
   Todo({
     required this.content,
     required this.createdAt,
     this.isCompleted = false,
     this.reminderDateTime,
+    this.icon,
   });
 
   Map<String, dynamic> toJson() => {
