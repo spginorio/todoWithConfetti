@@ -7,6 +7,8 @@ import 'package:todoapp/main.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:todoapp/add_todo_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:confetti/confetti.dart';
+import "package:todoapp/confetti.dart";
 
 class TodoList extends StatefulWidget {
   const TodoList({super.key});
@@ -17,12 +19,21 @@ class TodoList extends StatefulWidget {
 
 class TodoListState extends State<TodoList> {
   List<Todo> _todos = [];
+  late ConfettiController _confettiController;
 
   @override
   void initState() {
     super.initState();
     _loadTodos();
     _requestNotificationPermissions();
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 1));
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
   }
 
   void _requestNotificationPermissions() async {
@@ -87,16 +98,13 @@ class TodoListState extends State<TodoList> {
   void _toggleComplete(int index) {
     setState(() {
       _todos[index].isCompleted = !_todos[index].isCompleted;
+      if (_todos[index].isCompleted) {
+        _confettiController.play();
+      }
     });
     _saveTodos();
   }
 
-  /// Shows a date time picker dialog to set a reminder date and time
-  /// for the todo at [index].
-  ///
-  /// When the user selects a date and time, the todo at [index] is updated
-  /// with that date and time, and a notification is scheduled for that
-  /// date and time.
   void _setReminder(int index) {
     dateTimePicker(index);
   }
@@ -118,10 +126,6 @@ class TodoListState extends State<TodoList> {
     );
   }
 
-  /// Schedule a notification for the provided todo if a reminder date and time is set.
-  ///
-  /// If the reminder date and time for the todo is not null, this function creates a notification
-  /// with the todo details to remind the user about the task.
   void _scheduleNotification(Todo todo) async {
     if (todo.reminderDateTime != null) {
       await AwesomeNotifications().createNotification(
@@ -142,151 +146,199 @@ class TodoListState extends State<TodoList> {
     final txtColor = const Color.fromARGB(221, 10, 22, 180);
     final smallTxtColor = const Color.fromARGB(193, 53, 52, 52);
 
+//-----------------Text Styles for the PopUp Menu------------------
+    TextStyle popUpMenuTextStyle() {
+      return TextStyle(
+        color: Color.fromARGB(188, 106, 106, 235),
+        fontSize: 14.0,
+        fontFamily: GoogleFonts.aBeeZee().fontFamily,
+      );
+    }
+
+//-----------------Scaffold------------------
     return Scaffold(
-        appBar: AppBar(
-          title: Center(
-            child: Text(
-              'Todo List',
-              style: GoogleFonts.openSansCondensed(
-                decoration: TextDecoration.lineThrough,
-                letterSpacing: 3,
-                //TODO: adjust font
-                textStyle: TextStyle(
-                  color: const Color.fromARGB(
-                      221, 12, 26, 226), //TODO: adjust color
-                  fontSize: 29.0,
-                ),
+      appBar: AppBar(
+        title: Center(
+          child: Text(
+            'Todo List',
+            style: GoogleFonts.openSansCondensed(
+              decoration: TextDecoration.lineThrough,
+              letterSpacing: 3,
+              textStyle: TextStyle(
+                color: const Color.fromARGB(221, 12, 26, 226),
+                fontSize: 29.0,
               ),
             ),
           ),
-          backgroundColor: bgColor,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: _todos.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _todos[index]
-                            .isCompleted //TODO: Change Box Color when Completed
-                        ? const Color.fromARGB(29, 143, 143, 143)
-                        : const Color.fromARGB(92, 255, 241, 117),
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        child: _todos[index].isCompleted
-                            ? Padding(
-                                padding: const EdgeInsets.only(left: 12.0),
-                                child: Icon(Icons.check,
-                                    color:
-                                        const Color.fromARGB(151, 32, 134, 23),
-                                    size: 30.0),
-                              )
-                            : null,
-                      ),
-                      Expanded(
-                        child: ListTile(
-                          title: Text(
-                            _todos[index].content.length > 69
-                                ? '${_todos[index].content.substring(0, 69)}...'
-                                : _todos[index].content,
-                            //STYLE Font for List Items
-                            style: GoogleFonts.caveat(
-                              //TODO: adjust font
-                              textStyle: TextStyle(
-                                fontSize: 21.0,
-                                fontWeight: FontWeight.w600,
-                                color: _todos[index].isCompleted
-                                    ? Colors.grey
-                                    : txtColor,
+        backgroundColor: bgColor,
+      ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView.builder(
+              itemCount: _todos.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _todos[index].isCompleted
+                          ? const Color.fromARGB(29, 143, 143, 143)
+                          : const Color.fromARGB(125, 255, 241, 117),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          child: _todos[index].isCompleted
+                              ? Padding(
+                                  padding: const EdgeInsets.only(left: 12.0),
+                                  child: Icon(Icons.check,
+                                      color: const Color.fromARGB(
+                                          151, 32, 134, 23),
+                                      size: 30.0),
+                                )
+                              : null,
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: Text(
+                              _todos[index].content.length > 69
+                                  ? '${_todos[index].content.substring(0, 69)}...'
+                                  : _todos[index].content,
+                              style: GoogleFonts.caveat(
+                                textStyle: TextStyle(
+                                  fontSize: 23.0,
+                                  fontWeight: FontWeight.w600,
+                                  color: _todos[index].isCompleted
+                                      ? Colors.grey
+                                      : txtColor,
+                                ),
                               ),
                             ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Created: ${DateFormat('yyyy-MM-dd').format(_todos[index].createdAt)}',
-                                style: TextStyle(
-                                  //CREATED color
-                                  color: smallTxtColor,
-                                  fontFamily: GoogleFonts.openSans().fontFamily,
-                                  fontSize: 13,
-                                  letterSpacing: -0.3,
-                                ),
-                              ),
-                              if (_todos[index].reminderDateTime != null)
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Text(
-                                  'Reminder: ${DateFormat('yyyy-MM-dd HH:mm').format(_todos[index].reminderDateTime!)}',
+                                  'Created: ${DateFormat('yyyy-MM-dd').format(_todos[index].createdAt)}',
                                   style: TextStyle(
-                                      //REMINDER color
-                                      color: smallTxtColor,
-                                      fontFamily:
-                                          GoogleFonts.openSans().fontFamily,
-                                      fontSize: 13.5,
-                                      letterSpacing: -0.3),
+                                    color: smallTxtColor,
+                                    fontFamily:
+                                        GoogleFonts.openSans().fontFamily,
+                                    fontSize: 12,
+                                    letterSpacing: -0.3,
+                                  ),
                                 ),
-                            ],
+                                if (_todos[index].reminderDateTime != null)
+                                  Text(
+                                    'Reminder: ${DateFormat('yyyy-MM-dd HH:mm').format(_todos[index].reminderDateTime!)}',
+                                    style: TextStyle(
+                                        color: smallTxtColor,
+                                        fontFamily:
+                                            GoogleFonts.openSans().fontFamily,
+                                        fontSize: 12,
+                                        letterSpacing: -0.3),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      PopupMenuButton<String>(
-                        iconColor: Colors.grey,
-                        onSelected: (value) {
-                          switch (value) {
-                            case 'delete':
-                              _deleteTodo(index);
-                              break;
-                            case 'edit':
-                              _editTodo(index);
-                              break;
-                            case 'complete':
-                              _toggleComplete(index);
-                              break;
-                            case 'reminder':
-                              _setReminder(index);
-                              break;
-                          }
-                        },
-                        itemBuilder: (BuildContext context) =>
-                            <PopupMenuEntry<String>>[
-                          const PopupMenuItem<String>(
-                            value: 'delete',
-                            child: Text('Delete'),
-                          ),
-                          const PopupMenuItem<String>(
-                            value: 'edit',
-                            child: Text('Edit'),
-                          ),
-                          PopupMenuItem<String>(
-                            value: 'complete',
-                            child: Text(_todos[index].isCompleted
-                                ? 'Mark as Incomplete'
-                                : 'Mark as Complete'),
-                          ),
-                          const PopupMenuItem<String>(
-                            value: 'reminder',
-                            child: Text('Set Reminder'),
-                          ),
-                        ],
-                      ),
-                    ],
+
+                        // Popup Menu properties for the icon and the menu itself
+                        PopupMenuButton<String>(
+                          color: Colors.white,
+                          elevation: 3,
+                          iconColor: const Color.fromARGB(129, 143, 140, 140),
+                          onSelected: (value) {
+                            switch (value) {
+                              case 'delete':
+                                _deleteTodo(index);
+                                break;
+                              case 'edit':
+                                _editTodo(index);
+                                break;
+                              case 'complete':
+                                _toggleComplete(index);
+                                break;
+                              case 'reminder':
+                                _setReminder(index);
+                                break;
+                            }
+                          },
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry<String>>[
+                            PopupMenuItem<String>(
+                              value: 'delete',
+                              child: Text(
+                                'Delete',
+                                style: popUpMenuTextStyle(),
+                              ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'edit',
+                              child: Text(
+                                'Edit',
+                                style: popUpMenuTextStyle(),
+                              ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'complete',
+                              child: Text(
+                                _todos[index].isCompleted
+                                    ? 'Mark as Incomplete'
+                                    : 'Mark as Complete',
+                                style: popUpMenuTextStyle(),
+                              ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'reminder',
+                              child: Text(
+                                'Set Reminder',
+                                style: popUpMenuTextStyle(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _addTodo,
-          child: const Icon(Icons.add),
-        ),
-        //BACKGROUND COLOR
-        backgroundColor: bgColor);
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              blastDirection: 180, // straight up
+              emissionFrequency: 0.2,
+              numberOfParticles: 25,
+              maxBlastForce: 40,
+              minBlastForce: 20,
+              gravity: 0.2,
+              shouldLoop: false,
+              colors: const [
+                Color.fromARGB(255, 19, 168, 51),
+                Color.fromARGB(255, 68, 70, 230),
+                Color.fromARGB(255, 255, 230, 0),
+                Color.fromARGB(255, 233, 100, 100),
+                Color.fromARGB(255, 239, 116, 255),
+                Color.fromARGB(255, 240, 147, 7),
+              ],
+
+              createParticlePath: drawStar,
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addTodo,
+        child: const Icon(Icons.add),
+      ),
+      backgroundColor: bgColor,
+    );
   }
 }
