@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:intl/intl.dart';
@@ -205,8 +206,8 @@ class TodoListState extends State<TodoList> {
                         Expanded(
                           child: ListTile(
                             title: Text(
-                              _todos[index].content.length > 69
-                                  ? '${_todos[index].content.substring(0, 69)}...'
+                              _todos[index].content.length > 1000
+                                  ? '${_todos[index].content.substring(0, 1000)}...'
                                   : _todos[index].content,
                               style: GoogleFonts.caveat(
                                 textStyle: TextStyle(
@@ -244,6 +245,21 @@ class TodoListState extends State<TodoList> {
                               ],
                             ),
                           ),
+                        ),
+                        GestureDetector(
+                          child: Icon(
+                            Icons.copy,
+                            color: const Color.fromARGB(129, 143, 140, 140),
+                            size: 22.0,
+                          ),
+                          onTap: () {
+                            Clipboard.setData(
+                                ClipboardData(text: _todos[index].content));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text('Copied to Clipboard'),
+                            ));
+                          },
                         ),
 
                         // Popup Menu properties for the icon and the menu itself

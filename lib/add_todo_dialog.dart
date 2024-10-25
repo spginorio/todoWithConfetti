@@ -40,6 +40,7 @@ class AddTodoDialogState extends State<AddTodoDialog> {
         style: GoogleFonts.openSans(textStyle: const TextStyle(fontSize: 18.0)),
         controller: _controller,
         autofocus: true,
+        maxLines: null,
         decoration: const InputDecoration(
             hintText: ' Enter todo..',
             hintStyle: TextStyle(color: Color.fromARGB(69, 110, 110, 110)),
