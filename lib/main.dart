@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:todoapp/todo_list.dart';
 
+// Initialize awesome notifications and run the todoapp.
+//
+// The [AwesomeNotifications.initialize] is called to initialize the
+// notification channels. The 'scheduled_channel' is set up for scheduled
+// notifications. The app is then started with [runApp].
+//
+// The WidgetsFlutterBinding.ensureInitialized is called to ensure that the
+// binding is initialized before calling AwesomeNotifications.initialize...
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AwesomeNotifications().initialize(
@@ -51,6 +59,14 @@ class Todo {
     this.icon,
   });
 
+  // Converts the Todo object into a JSON map.
+  //
+  // The map contains the following keys:
+  // content: the content of the Todo
+  // createdAt: the ISO8601-formatted string of the Todo's creation time
+  // isCompleted: a boolean indicating whether the Todo is completed
+  // reminderDateTime: the ISO8601-formatted string of the Todo's reminder
+  // time, or null if there is no reminder.
   Map<String, dynamic> toJson() => {
         'content': content,
         'createdAt': createdAt.toIso8601String(),

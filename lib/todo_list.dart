@@ -110,6 +110,8 @@ class TodoListState extends State<TodoList> {
     dateTimePicker(index);
   }
 
+  // Displays a date and time picker dialog to set a reminder for a todo item.
+  // the flutter_datetime_picker_plus looks better and is easier to use.
   Future<DateTime?> dateTimePicker(int index) {
     return DatePicker.showDateTimePicker(
       context,
@@ -127,6 +129,14 @@ class TodoListState extends State<TodoList> {
     );
   }
 
+  // Schedule a notification for the [Todo] item at the scheduled time.
+  // If the todo item has no reminder date, no notification is scheduled.
+
+  // The notification is given an ID that is the hashcode of the todo item, so
+  // that if the user changes the reminder date for the todo item and then
+  // schedules the notification again, the previous notification is canceled.
+
+  /// The notification is scheduled on the channel with key 'scheduled_channel'.
   void _scheduleNotification(Todo todo) async {
     if (todo.reminderDateTime != null) {
       await AwesomeNotifications().createNotification(
@@ -143,6 +153,7 @@ class TodoListState extends State<TodoList> {
 
   @override
   Widget build(BuildContext context) {
+//-----------------Colors text------------------
     final bgColor = const Color.fromARGB(255, 255, 255, 255);
     final txtColor = const Color.fromARGB(221, 10, 22, 180);
     final smallTxtColor = const Color.fromARGB(193, 53, 52, 52);
@@ -261,7 +272,6 @@ class TodoListState extends State<TodoList> {
                             ));
                           },
                         ),
-
                         // Popup Menu properties for the icon and the menu itself
                         PopupMenuButton<String>(
                           color: Colors.white,
