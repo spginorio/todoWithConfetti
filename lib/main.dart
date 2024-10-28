@@ -3,9 +3,6 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:todoapp/todo_list.dart';
 
 // Initialize awesome notifications
-// The AwesomeNotifications.initialize is called to initialize the
-// notification channels. The scheduled_channel is set up for scheduled
-// notifications.
 // The WidgetsFlutterBinding.ensureInitialized is called to ensure that the
 // binding is initialized before calling AwesomeNotifications.initialize...
 void main() async {

@@ -64,6 +64,8 @@ class AddTodoDialogState extends State<AddTodoDialog> {
   }
 
   @override
+
+  // Clean up the controller when the widget is removed
   void dispose() {
     _controller.dispose();
     super.dispose();
