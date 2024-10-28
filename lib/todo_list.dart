@@ -300,6 +300,7 @@ class TodoListState extends State<TodoList> {
                               child: Text(
                                 'Delete',
                                 style: popUpMenuTextStyle(),
+                                //TODO delete notification when the taks is deleted
                               ),
                             ),
                             PopupMenuItem<String>(
@@ -336,6 +337,7 @@ class TodoListState extends State<TodoList> {
           ),
           Align(
             alignment: Alignment.topCenter,
+            //------------------Confetti widget------------------
             child: ConfettiWidget(
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
