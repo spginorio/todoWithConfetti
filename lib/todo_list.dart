@@ -336,6 +336,7 @@ class TodoListState extends State<TodoList> {
           ),
           Align(
             alignment: Alignment.topCenter,
+            // Confetti Package
             child: ConfettiWidget(
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
