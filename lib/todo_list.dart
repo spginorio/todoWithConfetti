@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:intl/intl.dart';
-import 'package:todoapp/main.dart';
+import 'package:todoapp/todo_class.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:todoapp/add_todo_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
