@@ -77,6 +77,11 @@ class TodoListState extends State<TodoList> {
   }
 
   void _deleteTodo(int index) {
+    //delets the notification for the todo if it exists
+    if (_todos[index].reminderDateTime != null) {
+      AwesomeNotifications().cancel(_todos[index].hashCode);
+    }
+
     setState(() {
       _todos.removeAt(index);
     });
@@ -188,7 +193,7 @@ class TodoListState extends State<TodoList> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 50),
             child: ListView.builder(
               itemCount: _todos.length,
               itemBuilder: (context, index) {
@@ -300,7 +305,6 @@ class TodoListState extends State<TodoList> {
                               child: Text(
                                 'Delete',
                                 style: popUpMenuTextStyle(),
-                                //TODO delete notification when the taks is deleted
                               ),
                             ),
                             PopupMenuItem<String>(
