@@ -149,14 +149,15 @@ class TodoListState extends State<TodoList> {
     );
   }
 
-  // Schedule a notification for the [Todo] item at the scheduled time.
-  // If the todo item has no reminder date, no notification is scheduled.
+  /* Schedule a notification for the [Todo] item at the scheduled time.
+   If the todo item has no reminder date, no notification is scheduled.
 
-  // The notification is given an ID that is the hashcode of the todo item, so
-  // that if the user changes the reminder date for the todo item and then
-  // schedules the notification again, the previous notification is canceled.
+   The notification is given an ID that is the hashcode of the todo item, so
+  that if the user changes the reminder date for the todo item and then
+   schedules the notification again, the previous notification is canceled.
 
-  /// The notification is scheduled on the channel with key 'scheduled_channel'.
+   The notification is scheduled on the channel with key 'scheduled_channel'.
+  */
   void _scheduleNotification(Todo todo) async {
     if (todo.reminderDateTime != null) {
       await AwesomeNotifications().createNotification(
@@ -182,6 +183,22 @@ class TodoListState extends State<TodoList> {
     await prefs.setBool('isHandWrittenStyle', isHandWrittenStyle);
   }
 
+  //Copy to clipboard
+  void _copyToClipboard(int index) {
+    Clipboard.setData(ClipboardData(text: _todos[index].content));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        content: Center(
+            child: Text(
+          'Copied to clipboard!',
+          style: TextStyle(color: Color.fromARGB(255, 106, 121, 189)),
+        )),
+        duration: Duration(milliseconds: 1300),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 //!-----------------Colors text------------------
@@ -199,7 +216,6 @@ class TodoListState extends State<TodoList> {
     }
 
 //!-----------------Text Styles Fonts for the Todo List------------------
-
     var todosTextStyleHandWritten =
         GoogleFonts.caveat(fontWeight: FontWeight.w600, wordSpacing: 2.0);
     var todosTextStyleCompFormat = GoogleFonts.roboto(
@@ -267,7 +283,7 @@ class TodoListState extends State<TodoList> {
                             Navigator.pop(context);
                           },
                           child: Text(
-                            '''A simple to-do/notes app that celebrates with confetti across your screen when you mark a task as completed.\n  \nYou can set reminders, edit or update your to-dos, change the font, and long-press on a to-do to copy its content to your clipboard.\n  \nMore features will be added in future updates.   ''',
+                            '''A simple to-do/notes app that celebrates with confetti across your screen when you mark a task as completed.\n  \nYou can set reminders, edit or update your to-dos, change the font, copy the content to your clipboard and long-press to drag and rearrange tasks.\n  \nMore features will be added in future updates.\n \nThank you for using this app!''',
                             style: TextStyle(
                                 color:
                                     const Color.fromARGB(255, 117, 115, 115)),
@@ -287,12 +303,12 @@ class TodoListState extends State<TodoList> {
                         padding: const EdgeInsets.only(right: 10.0),
                         child: Icon(
                           Icons.compare_arrows_rounded,
-                          color: const Color.fromARGB(255, 156, 156, 156),
+                          color: const Color.fromARGB(255, 198, 198, 198),
                         ),
                       ),
                       Text('Font Style',
                           style: TextStyle(
-                            color: const Color.fromARGB(255, 210, 138, 133),
+                            color: const Color.fromARGB(255, 148, 148, 148),
                           )),
                     ],
                   ),
@@ -304,7 +320,7 @@ class TodoListState extends State<TodoList> {
                       Padding(
                         padding: const EdgeInsets.only(left: 4.0, right: 10.0),
                         child: Icon(Icons.info_outlined,
-                            color: const Color.fromARGB(255, 156, 156, 156),
+                            color: const Color.fromARGB(255, 198, 198, 198),
                             size: 20),
                       ),
                       Text('About',
@@ -323,165 +339,168 @@ class TodoListState extends State<TodoList> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 8, 8, 60),
-            child: ListView.builder(
+            child: ReorderableListView.builder(
               itemCount: _todos.length,
               itemBuilder: (context, index) {
                 return Padding(
+                  key: ValueKey(_todos[index].hashCode),
                   padding: const EdgeInsets.all(5.0),
                   // Wrap the ListTile in a GestureDetector to detect long press
                   // and copy the todo content to the clipboard
-                  child: GestureDetector(
-                    onLongPress: () {
-                      Clipboard.setData(
-                          ClipboardData(text: _todos[index].content));
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Copied to Clipboard'),
-                      ));
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: _todos[index].isCompleted
-                            ? const Color.fromARGB(29, 143, 143, 143)
-                            : const Color.fromARGB(125, 255, 241, 117),
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child: Row(
-                        children: [
-                          // Add a checkmark icon if the todo is completed
-                          Container(
-                            child: _todos[index].isCompleted
-                                ? Padding(
-                                    padding: const EdgeInsets.only(left: 12.0),
-                                    child: Icon(Icons.check,
-                                        color: const Color.fromARGB(
-                                            151, 32, 134, 23),
-                                        size: 30.0),
-                                  )
-                                : null,
-                          ),
-                          Expanded(
-                            child: ListTile(
-                              title: Text(
-                                _todos[index].content.length > 1000
-                                    ? '${_todos[index].content.substring(0, 1000)}...'
-                                    : _todos[index].content,
-                                style: isHandWrittenStyle
-                                    ? todosTextStyleHandWritten.copyWith(
-                                        fontSize: 25.0,
-                                        color: _todos[index].isCompleted
-                                            ? Colors.grey
-                                            : txtColor,
-                                      )
-                                    : todosTextStyleCompFormat.copyWith(
-                                        //fontSize: 20.0,
-                                        color: _todos[index].isCompleted
-                                            ? Colors.grey
-                                            : txtColor,
-                                      ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Created: ${DateFormat('yyyy-MM-dd').format(_todos[index].createdAt)}',
-                                    style: TextStyle(
-                                      color: smallTxtColor,
-                                      fontFamily:
-                                          GoogleFonts.openSans().fontFamily,
-                                      fontSize: 12,
-                                      letterSpacing: -0.3,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _todos[index].isCompleted
+                          ? const Color.fromARGB(29, 143, 143, 143)
+                          : const Color.fromARGB(125, 255, 241, 117),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    child: Row(
+                      children: [
+                        // Add a checkmark icon if the todo is completed
+                        Container(
+                          child: _todos[index].isCompleted
+                              ? Padding(
+                                  padding: const EdgeInsets.only(left: 12.0),
+                                  child: Icon(Icons.check_rounded,
+                                      color: const Color.fromARGB(
+                                          151, 32, 134, 23),
+                                      size: 30.0),
+                                )
+                              : null,
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: Text(
+                              _todos[index].content.length > 1000
+                                  ? '${_todos[index].content.substring(0, 1000)}...'
+                                  : _todos[index].content,
+                              style: isHandWrittenStyle
+                                  ? todosTextStyleHandWritten.copyWith(
+                                      fontSize: 25.0,
+                                      color: _todos[index].isCompleted
+                                          ? Colors.grey
+                                          : txtColor,
+                                    )
+                                  : todosTextStyleCompFormat.copyWith(
+                                      color: _todos[index].isCompleted
+                                          ? Colors.grey
+                                          : txtColor,
                                     ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Created: ${DateFormat('yyyy-MM-dd').format(_todos[index].createdAt)}',
+                                  style: TextStyle(
+                                    color: smallTxtColor,
+                                    fontFamily:
+                                        GoogleFonts.openSans().fontFamily,
+                                    fontSize: 12,
+                                    letterSpacing: -0.3,
                                   ),
-                                  if (_todos[index].reminderDateTime != null)
-                                    Text(
-                                      'Reminder: ${DateFormat('yyyy-MM-dd HH:mm').format(_todos[index].reminderDateTime!)}',
-                                      style: TextStyle(
-                                          color: smallTxtColor,
-                                          fontFamily:
-                                              GoogleFonts.openSans().fontFamily,
-                                          fontSize: 12,
-                                          letterSpacing: -0.3),
-                                    ),
-                                ],
-                              ),
+                                ),
+                                if (_todos[index].reminderDateTime != null)
+                                  Text(
+                                    'Reminder: ${DateFormat('yyyy-MM-dd HH:mm').format(_todos[index].reminderDateTime!)}',
+                                    style: TextStyle(
+                                        color: smallTxtColor,
+                                        fontFamily:
+                                            GoogleFonts.openSans().fontFamily,
+                                        fontSize: 12,
+                                        letterSpacing: -0.3),
+                                  ),
+                              ],
                             ),
                           ),
-                          // // Copy icon
-                          // GestureDetector(
-                          //   child: Icon(
-                          //     Icons.copy,
-                          //     color: const Color.fromARGB(129, 143, 140, 140),
-                          //     size: 22.0,
-                          //   ),
-                          //   onTap: () {
-                          //     Clipboard.setData(
-                          //         ClipboardData(text: _todos[index].content));
-                          //     ScaffoldMessenger.of(context)
-                          //         .showSnackBar(const SnackBar(
-                          //       content: Text('Copied to Clipboard'),
-                          //     ));
-                          //   },
-                          // ),
-                          // Popup Menu properties for the icon and the menu itself
-                          PopupMenuButton<String>(
-                            color: Colors.white,
-                            elevation: 3,
-                            iconColor: const Color.fromARGB(129, 143, 140, 140),
-                            onSelected: (value) {
-                              switch (value) {
-                                case 'delete':
-                                  _deleteTodo(index);
-                                  break;
-                                case 'edit':
-                                  _editTodo(index);
-                                  break;
-                                case 'complete':
-                                  _toggleComplete(index);
-                                  break;
-                                case 'reminder':
-                                  _setReminder(index);
-                                  break;
-                              }
-                            },
-                            itemBuilder: (BuildContext context) =>
-                                <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                value: 'delete',
+                        ),
+                        // Popup Menu properties for the icon and the menu itself
+                        PopupMenuButton<String>(
+                          color: Colors.white,
+                          elevation: 3,
+                          iconColor: const Color.fromARGB(129, 143, 140, 140),
+                          onSelected: (value) {
+                            switch (value) {
+                              case 'delete':
+                                deleteWithConfirmation(context, index);
+                                break;
+                              case 'edit':
+                                _editTodo(index);
+                                break;
+                              case 'complete':
+                                _toggleComplete(index);
+                                break;
+                              case 'reminder':
+                                _setReminder(index);
+                                break;
+                              case 'copy':
+                                _copyToClipboard(index);
+                                break;
+                            }
+                          },
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry<String>>[
+                            PopupMenuItem<String>(
+                                value: 'copy',
                                 child: Text(
-                                  'Delete',
+                                  "Copy",
                                   style: popUpMenuTextStyle(),
-                                ),
+                                )),
+                            PopupMenuItem<String>(
+                              value: 'edit',
+                              child: Text(
+                                'Edit',
+                                style: popUpMenuTextStyle(),
                               ),
-                              PopupMenuItem<String>(
-                                value: 'edit',
-                                child: Text(
-                                  'Edit',
-                                  style: popUpMenuTextStyle(),
-                                ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'delete',
+                              child: Text(
+                                'Delete',
+                                style: popUpMenuTextStyle(),
                               ),
-                              PopupMenuItem<String>(
-                                value: 'complete',
-                                child: Text(
-                                  _todos[index].isCompleted
-                                      ? 'Mark as Incomplete'
-                                      : 'Mark as Complete',
-                                  style: popUpMenuTextStyle(),
-                                ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'complete',
+                              child: Text(
+                                _todos[index].isCompleted
+                                    ? 'Mark as Incomplete'
+                                    : 'Mark as Complete',
+                                style: popUpMenuTextStyle(),
+                                //TODO: Add yayyy sound when completed,
+                                //TODO: in the hamburger menu give the option to activate or deactivate sound
                               ),
-                              PopupMenuItem<String>(
-                                value: 'reminder',
-                                child: Text(
-                                  'Set Reminder',
-                                  style: popUpMenuTextStyle(),
-                                ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'reminder',
+                              child: Text(
+                                'Set Reminder',
+                                style: popUpMenuTextStyle(),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 );
+              },
+              onReorder: (int oldIndex, int newIndex) {
+                setState(() {
+                  // Adjust newIndex if dragging an item from earlier to later position
+                  if (oldIndex < newIndex) {
+                    newIndex -= 1;
+                  }
+
+                  // Remove the item from the old position
+                  final Todo item = _todos.removeAt(oldIndex);
+
+                  // Insert the item at the new position
+                  _todos.insert(newIndex, item);
+
+                  // Save the updated todo list order
+                  _saveTodos();
+                });
               },
             ),
           ),
@@ -517,6 +536,58 @@ class TodoListState extends State<TodoList> {
         child: const Icon(Icons.add),
       ),
       backgroundColor: bgColor,
+    );
+  }
+
+  /// Shows an alert dialog to confirm the deletion of a todo at [index].
+  ///
+  /// The dialog displays the title "Delete Todo:" and two buttons: "Cancel" and
+  /// "Delete". The "Cancel" button simply closes the dialog when pressed.
+  /// The "Delete" button calls [_deleteTodo] with [index] and then closes the
+  /// dialog.
+  ///
+  /// Returns a [Future] that resolves when the dialog is closed.
+  ///
+  /// See also:
+  ///
+  /// * [_deleteTodo], which is called when the "Delete" button is pressed.
+  Future<dynamic> deleteWithConfirmation(BuildContext context, int index) {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Center(
+          child: Text(
+            'Delete To-do:',
+            style: TextStyle(
+              color: const Color.fromARGB(255, 210, 138, 133),
+            ),
+          ),
+        ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'Cancel',
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  _deleteTodo(index);
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Delete',
+                  style: TextStyle(
+                      color: const Color.fromARGB(255, 228, 115, 107)),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
 }

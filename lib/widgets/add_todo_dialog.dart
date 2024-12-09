@@ -49,7 +49,7 @@ class AddTodoDialogState extends State<AddTodoDialog> {
       actions: <Widget>[
         TextButton(
           child: const Text('CANCEL',
-              style: TextStyle(color: Color.fromARGB(200, 219, 139, 163))),
+              style: TextStyle(color: Color.fromARGB(255, 161, 161, 161))),
           onPressed: () => Navigator.of(context).pop(),
         ),
         TextButton(
