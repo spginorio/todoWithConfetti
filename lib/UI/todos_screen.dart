@@ -4,12 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:intl/intl.dart';
-import 'package:todoapp/todo_class.dart';
+import 'package:todoapp/models/todo_class.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
-import 'package:todoapp/add_todo_dialog.dart';
+import 'package:todoapp/widgets/add_todo_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:confetti/confetti.dart';
-import "package:todoapp/confetti.dart";
+import "package:todoapp/animations/confetti.dart";
 
 class TodoList extends StatefulWidget {
   const TodoList({super.key});
@@ -184,12 +184,12 @@ class TodoListState extends State<TodoList> {
 
   @override
   Widget build(BuildContext context) {
-//-----------------Colors text------------------
+//!-----------------Colors text------------------
     final bgColor = const Color.fromARGB(255, 255, 255, 255);
     final txtColor = const Color.fromARGB(221, 10, 22, 180);
     final smallTxtColor = const Color.fromARGB(193, 53, 52, 52);
 
-//-----------------Text Styles for the PopUp Menu------------------
+//!-----------------Text Styles for the PopUp Menu------------------
     TextStyle popUpMenuTextStyle() {
       return TextStyle(
         color: Color.fromARGB(188, 106, 106, 235),
@@ -198,7 +198,7 @@ class TodoListState extends State<TodoList> {
       );
     }
 
-//-----------------Text Styles Fonts for the Todo List------------------
+//!-----------------Text Styles Fonts for the Todo List------------------
 
     var todosTextStyleHandWritten =
         GoogleFonts.caveat(fontWeight: FontWeight.w600, wordSpacing: 2.0);
@@ -208,7 +208,7 @@ class TodoListState extends State<TodoList> {
       letterSpacing: 0.3,
     );
 
-//-----------------Scaffold---------------------------------------
+//!-----------------Scaffold---------------------------------------
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -225,7 +225,7 @@ class TodoListState extends State<TodoList> {
         ),
         backgroundColor: bgColor,
         actions: [
-          // Popup menu
+          //! POPUP MENU
           Padding(
             padding: const EdgeInsets.only(right: 8.0, top: 8.0),
             child: PopupMenuButton<String>(
@@ -248,6 +248,7 @@ class TodoListState extends State<TodoList> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
+                      //! ALERT DIALOG
                       return AlertDialog(
                         scrollable: true,
                         shape: RoundedRectangleBorder(
@@ -280,17 +281,38 @@ class TodoListState extends State<TodoList> {
               itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                 PopupMenuItem<String>(
                   value: 'Reset',
-                  child: Text('Font Style',
-                      style: TextStyle(
-                        color: const Color.fromARGB(255, 210, 138, 133),
-                      )),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10.0),
+                        child: Icon(
+                          Icons.compare_arrows_rounded,
+                          color: const Color.fromARGB(255, 156, 156, 156),
+                        ),
+                      ),
+                      Text('Font Style',
+                          style: TextStyle(
+                            color: const Color.fromARGB(255, 210, 138, 133),
+                          )),
+                    ],
+                  ),
                 ),
                 PopupMenuItem<String>(
                   value: 'Option 2',
-                  child: Text('About',
-                      style: TextStyle(
-                        color: const Color.fromARGB(255, 148, 148, 148),
-                      )),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4.0, right: 10.0),
+                        child: Icon(Icons.info_outlined,
+                            color: const Color.fromARGB(255, 156, 156, 156),
+                            size: 20),
+                      ),
+                      Text('About',
+                          style: TextStyle(
+                            color: const Color.fromARGB(255, 148, 148, 148),
+                          )),
+                    ],
+                  ),
                 ),
               ],
             ),
