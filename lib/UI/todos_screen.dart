@@ -218,9 +218,11 @@ class TodoListState extends State<TodoList> {
     }
 
 //!-----------------Text Styles Fonts for the Todo List----------------------
+
     var todosTextStyleHandWritten =
         GoogleFonts.caveat(fontWeight: FontWeight.w600, wordSpacing: 2.0);
-    var todosTextStyleCompFormat = GoogleFonts.roboto(
+
+    var todosTextStyleCompFormat = GoogleFonts.openSans(
       fontWeight: FontWeight.normal,
       fontSize: 18.0,
       letterSpacing: 0.3,
@@ -374,7 +376,7 @@ class TodoListState extends State<TodoList> {
                           child: ListTile(
                             title: Text(
                               _todos[index].content.length > 1000
-                                  ? '${_todos[index].content.substring(0, 1000)}...'
+                                  ? '${_todos[index].content.substring(0, 4000)}...'
                                   : _todos[index].content,
                               style: isHandWrittenStyle
                                   ? todosTextStyleHandWritten.copyWith(
@@ -562,7 +564,7 @@ class TodoListState extends State<TodoList> {
           child: Text(
             'Delete To-do:',
             style: TextStyle(
-              color: const Color.fromARGB(255, 210, 138, 133),
+              color: const Color.fromARGB(255, 156, 156, 156),
             ),
           ),
         ),
