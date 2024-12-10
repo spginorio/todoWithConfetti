@@ -130,6 +130,7 @@ class TodoListState extends State<TodoList> {
     dateTimePicker(index);
   }
 
+//!---------------------Daytime picker---------------------------------------
   // Displays a date and time picker dialog to set a reminder for a todo item.
   // the flutter_datetime_picker_plus looks better and is easier to use.
   Future<DateTime?> dateTimePicker(int index) {
@@ -149,6 +150,7 @@ class TodoListState extends State<TodoList> {
     );
   }
 
+//!---------------------Notifications----------------------------------------
   /* Schedule a notification for the [Todo] item at the scheduled time.
    If the todo item has no reminder date, no notification is scheduled.
 
@@ -183,7 +185,7 @@ class TodoListState extends State<TodoList> {
     await prefs.setBool('isHandWrittenStyle', isHandWrittenStyle);
   }
 
-  //Copy to clipboard
+//!---------------------Copy to clipboard------------------------------------
   void _copyToClipboard(int index) {
     Clipboard.setData(ClipboardData(text: _todos[index].content));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -201,12 +203,12 @@ class TodoListState extends State<TodoList> {
 
   @override
   Widget build(BuildContext context) {
-//!-----------------Colors text------------------
+//!-----------------Colors text----------------------------------------------
     final bgColor = const Color.fromARGB(255, 255, 255, 255);
     final txtColor = const Color.fromARGB(221, 10, 22, 180);
     final smallTxtColor = const Color.fromARGB(193, 53, 52, 52);
 
-//!-----------------Text Styles for the PopUp Menu------------------
+//!-----------------Text Styles for the PopUp Menu---------------------------
     TextStyle popUpMenuTextStyle() {
       return TextStyle(
         color: Color.fromARGB(188, 106, 106, 235),
@@ -215,7 +217,7 @@ class TodoListState extends State<TodoList> {
       );
     }
 
-//!-----------------Text Styles Fonts for the Todo List------------------
+//!-----------------Text Styles Fonts for the Todo List----------------------
     var todosTextStyleHandWritten =
         GoogleFonts.caveat(fontWeight: FontWeight.w600, wordSpacing: 2.0);
     var todosTextStyleCompFormat = GoogleFonts.roboto(
@@ -224,7 +226,7 @@ class TodoListState extends State<TodoList> {
       letterSpacing: 0.3,
     );
 
-//!-----------------Scaffold---------------------------------------
+//!-----------------Scaffold-------------------------------------------------
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
