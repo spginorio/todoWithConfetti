@@ -26,7 +26,7 @@ class AddTodoDialogState extends State<AddTodoDialog> {
     return AlertDialog(
       title: Center(
         child: Text(
-          widget.initialValue == null ? 'Add Todo' : 'Edit Todo',
+          widget.initialValue == null ? 'Add To-do' : 'Edit To-do',
           style: GoogleFonts.openSans(
             textStyle: TextStyle(
                 color: const Color.fromARGB(255, 49, 190, 148),
@@ -42,7 +42,7 @@ class AddTodoDialogState extends State<AddTodoDialog> {
         autofocus: true,
         maxLines: null,
         decoration: const InputDecoration(
-            hintText: ' Enter todo..',
+            hintText: ' Enter to-do..',
             hintStyle: TextStyle(color: Color.fromARGB(69, 110, 110, 110)),
             border: InputBorder.none),
       ),

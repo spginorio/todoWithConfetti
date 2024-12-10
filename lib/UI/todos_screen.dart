@@ -266,7 +266,7 @@ class TodoListState extends State<TodoList> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      //! ALERT DIALOG
+                      //! -------------------ALERT DIALOG--------------------
                       return AlertDialog(
                         scrollable: true,
                         shape: RoundedRectangleBorder(
@@ -541,6 +541,7 @@ class TodoListState extends State<TodoList> {
     );
   }
 
+//!-----------------------------Delete Confirmation-----------------------------
   /// Shows an alert dialog to confirm the deletion of a todo at [index].
   ///
   /// The dialog displays the title "Delete Todo:" and two buttons: "Cancel" and
