@@ -18,8 +18,11 @@ class TodoList extends StatefulWidget {
   TodoListState createState() => TodoListState();
 }
 
+// list of todos
 class TodoListState extends State<TodoList> {
   List<Todo> _todos = [];
+
+  //confetti controller
   late ConfettiController _confettiController;
 
   @override
@@ -33,9 +36,9 @@ class TodoListState extends State<TodoList> {
     _loadTextStylePreference();
   }
 
-  // Loads the user's saved text style preference from SharedPreferences.
+  // Loads the user saved text style preference from SharedPreferences.
   // If the user has previously saved a preference, it will be loaded and
-  // used to update the UI. Otherwise, the default text style will be used.
+  // used to update the UI. Otherwise the default text style will be used.
   void _loadTextStylePreference() async {
     final prefs = await SharedPreferences.getInstance();
     final bool? savedStyle = prefs.getBool('isHandWrittenStyle');
@@ -467,8 +470,6 @@ class TodoListState extends State<TodoList> {
                                     ? 'Mark as Incomplete'
                                     : 'Mark as Complete',
                                 style: popUpMenuTextStyle(),
-                                //TODO: Add yayyy sound when completed,
-                                //TODO: in the hamburger menu give the option to activate or deactivate sound
                               ),
                             ),
                             PopupMenuItem<String>(
@@ -550,7 +551,7 @@ class TodoListState extends State<TodoList> {
   ///
   /// See also:
   ///
-  /// * [_deleteTodo], which is called when the "Delete" button is pressed.
+  ///  [_deleteTodo], which is called when the "Delete" button is pressed.
   Future<dynamic> deleteWithConfirmation(BuildContext context, int index) {
     return showDialog(
       context: context,

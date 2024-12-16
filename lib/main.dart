@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:todoapp/UI/todos_screen.dart';
 
-// Initialize awesome notifications
-// The WidgetsFlutterBinding.ensureInitialized is called to ensure that the
-// binding is initialized before calling AwesomeNotifications.initialize...
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize awesome notifications
   await AwesomeNotifications().initialize(
     null,
     [
