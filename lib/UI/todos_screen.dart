@@ -133,6 +133,7 @@ class TodoListState extends State<TodoList> {
     dateTimePicker(index);
   }
 
+//!---------------------Daytime picker---------------------------------------
   // Displays a date and time picker dialog to set a reminder for a todo item.
   // the flutter_datetime_picker_plus looks better and is easier to use.
   Future<DateTime?> dateTimePicker(int index) {
@@ -152,6 +153,7 @@ class TodoListState extends State<TodoList> {
     );
   }
 
+//!---------------------Notifications----------------------------------------
   /* Schedule a notification for the [Todo] item at the scheduled time.
    If the todo item has no reminder date, no notification is scheduled.
 
@@ -186,7 +188,7 @@ class TodoListState extends State<TodoList> {
     await prefs.setBool('isHandWrittenStyle', isHandWrittenStyle);
   }
 
-  //Copy to clipboard
+//!---------------------Copy to clipboard------------------------------------
   void _copyToClipboard(int index) {
     Clipboard.setData(ClipboardData(text: _todos[index].content));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -204,12 +206,12 @@ class TodoListState extends State<TodoList> {
 
   @override
   Widget build(BuildContext context) {
-//!-----------------Colors text------------------
+//!-----------------Colors text----------------------------------------------
     final bgColor = const Color.fromARGB(255, 255, 255, 255);
     final txtColor = const Color.fromARGB(221, 10, 22, 180);
     final smallTxtColor = const Color.fromARGB(193, 53, 52, 52);
 
-//!-----------------Text Styles for the PopUp Menu------------------
+//!-----------------Text Styles for the PopUp Menu---------------------------
     TextStyle popUpMenuTextStyle() {
       return TextStyle(
         color: Color.fromARGB(188, 106, 106, 235),
@@ -218,16 +220,18 @@ class TodoListState extends State<TodoList> {
       );
     }
 
-//!-----------------Text Styles Fonts for the Todo List------------------
+//!-----------------Text Styles Fonts for the Todo List----------------------
+
     var todosTextStyleHandWritten =
         GoogleFonts.caveat(fontWeight: FontWeight.w600, wordSpacing: 2.0);
-    var todosTextStyleCompFormat = GoogleFonts.roboto(
+
+    var todosTextStyleCompFormat = GoogleFonts.openSans(
       fontWeight: FontWeight.normal,
       fontSize: 18.0,
       letterSpacing: 0.3,
     );
 
-//!-----------------Scaffold---------------------------------------
+//!-----------------Scaffold-------------------------------------------------
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -267,7 +271,7 @@ class TodoListState extends State<TodoList> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      //! ALERT DIALOG
+                      //! -------------------ALERT DIALOG--------------------
                       return AlertDialog(
                         scrollable: true,
                         shape: RoundedRectangleBorder(
@@ -375,7 +379,7 @@ class TodoListState extends State<TodoList> {
                           child: ListTile(
                             title: Text(
                               _todos[index].content.length > 1000
-                                  ? '${_todos[index].content.substring(0, 1000)}...'
+                                  ? '${_todos[index].content.substring(0, 4000)}...'
                                   : _todos[index].content,
                               style: isHandWrittenStyle
                                   ? todosTextStyleHandWritten.copyWith(
@@ -540,6 +544,7 @@ class TodoListState extends State<TodoList> {
     );
   }
 
+//!-----------------------------Delete Confirmation-----------------------------
   /// Shows an alert dialog to confirm the deletion of a todo at [index].
   ///
   /// The dialog displays the title "Delete Todo:" and two buttons: "Cancel" and
@@ -560,7 +565,7 @@ class TodoListState extends State<TodoList> {
           child: Text(
             'Delete To-do:',
             style: TextStyle(
-              color: const Color.fromARGB(255, 210, 138, 133),
+              color: const Color.fromARGB(255, 156, 156, 156),
             ),
           ),
         ),
